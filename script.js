@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const WHATSAPP_NUMBER = "6281234567890"; // Ganti dengan nomor WA kamu
+const WHATSAPP_NUMBER = "6281241813632"; // Ganti dengan nomor WA kamu
 
 const PRODUCTS = [
   { id: "k1", name: "KOMILK Murni", price: 17000, image: "assets/prod_murni.png", desc: "Susu murni segar, creamy, dan alami tanpa campuran." },
