@@ -3,137 +3,115 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>KOMILK — Susu Segar</title>
+  <title>KOMILK — Susu Segar Premium</title>
   <link rel="stylesheet" href="style.css" />
-  <meta name="theme-color" content="#017DC5" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#">
-        <img src="assets/Logo.png" alt="KOMILK" class="brand-logo" />
-        <div class="brand-text">
-          <span class="brand-name">KOMILK</span>
-          <span class="brand-sub">Susu segar, gaya hidup sehat</span>
-        </div>
+
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <img src="assets/Logo.png" alt="Logo" class="logo">
+        <span>KOMILK</span>
       </a>
 
-      <nav class="nav" aria-label="Main navigation">
-        <a href="#products">Menu</a>
+      <div class="nav-links">
+        <a href="#menu">Menu</a>
         <a href="#about">Tentang</a>
-        <a href="#why">Keunggulan</a>
-      </nav>
+        <a href="#contact">Lokasi</a>
+      </div>
+      
+      <button id="openCartBtn" class="cart-trigger">
+        Keranjang
+        <span id="cartCount">0</span>
+      </button>
+    </div>
+  </nav>
 
-      <div class="actions">
-        <button id="openCartBtn" class="btn cart-btn" aria-label="Buka keranjang">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 6h15l-1.5 9h-12L6 6z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span id="cartCount" class="cart-count">0</span>
-        </button>
+  <header class="hero">
+    <div class="container hero-content">
+      <div class="hero-text">
+        <h1>Susu Segar,<br>Gaya Hidup Sehat</h1>
+        <p>Nikmati kesegaran susu murni dengan varian rasa alami. Dibuat fresh setiap hari untuk mood terbaikmu.</p>
+        <a href="#menu" class="btn-main">Pesan Sekarang</a>
+      </div>
+      <div class="hero-img">
+        <img src="assets/prod_murni.png" alt="Komilk Murni">
       </div>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-inner">
-        <div class="hero-left">
-          <h1>Segar, Nikmat, dan Bergizi — KOMILK</h1>
-          <p>Diolah daily dari susu segar. Pilih varian favorit: Original, Coklat, Strawberry.</p>
-          <div class="hero-ctas">
-            <a href="#products" class="btn btn-primary">Lihat Menu</a>
-            <a href="#about" class="btn btn-ghost">Tentang Kami</a>
-          </div>
-          <ul class="features">
-            <li><strong>Fresh Daily</strong> — Produksi harian untuk kesegaran.</li>
-            <li><strong>100% Real Milk</strong> — Bahan alami berkualitas.</li>
-          </ul>
-        </div>
-        <div class="hero-right" aria-hidden="true">
-          <img src="assets/prod_original.png" alt="KOMILK Original" class="hero-image" onerror="this.src='assets/placeholder.png'"/>
-        </div>
-      </div>
-    </section>
+  <section id="menu" class="container section">
+    <h2 class="section-title">Pilihan Favorit</h2>
+    <div id="productsGrid" class="grid"></div>
+  </section>
 
-    <section id="products" class="section container">
-      <div class="section-head">
-        <h2 class="section-title">Menu Kami</h2>
-        <p class="section-sub">Tambahkan ke keranjang lalu checkout lewat WhatsApp.</p>
-      </div>
-
-      <div id="productsGrid" class="products-grid" aria-live="polite">
-        <!-- produk dirender oleh script.js -->
-      </div>
-    </section>
-
-    <section id="about" class="section bg-soft">
-      <div class="container split">
-        <div>
-          <h3>Tentang KOMILK</h3>
-          <p>KOMILK berkomitmen menghadirkan susu segar berkualitas dengan rasa alami. Diproses bersih dan dikemas rapi agar Anda mendapatkan pengalaman minum terbaik.</p>
+  <section id="about" class="section bg-soft">
+    <div class="container">
+      <div class="about-card">
+        <div class="about-img">
+          <img src="assets/prod_gula_aren.png" alt="Tentang Komilk">
         </div>
-        <div>
-          <ul class="bullets">
-            <li>Diproduksi harian</li>
-            <li>Tanpa pengawet</li>
-            <li>Varian rasa ramah keluarga</li>
+        <div class="about-content">
+          <span class="badge">Tentang Kami</span>
+          <h2>Kualitas Murni Tanpa Kompromi</h2>
+          <p>KOMILK hadir dari keresahan akan sulitnya mencari susu segar yang benar-benar alami. Kami berkomitmen menyajikan susu sapi murni yang diproses secara higienis setiap pagi.</p>
+          <ul class="features-list">
+            <li><strong>🥛 100% Fresh Milk</strong> <span>Diperah langsung dari peternakan lokal terpercaya.</span></li>
+            <li><strong>🌿 Bahan Alami</strong> <span>Tanpa pengawet buatan, aman untuk keluarga.</span></li>
+            <li><strong>✨ Rasa Premium</strong> <span>Tekstur creamy yang pas, tidak bikin eneg.</span></li>
           </ul>
         </div>
       </div>
-    </section>
-
-    <section id="why" class="section container">
-      <h3>Kenapa Pilih KOMILK?</h3>
-      <div class="cards">
-        <div class="card">
-          <strong>Fresh Daily</strong>
-          <p>Kesegaran terjaga karena proses harian.</p>
-        </div>
-        <div class="card">
-          <strong>Nutrisi Lengkap</strong>
-          <p>Kaya kalsium dan protein untuk aktivitas sehari-hari.</p>
-        </div>
-        <div class="card">
-          <strong>Rasa Nikmat</strong>
-          <p>Rasa lembut yang disukai keluarga.</p>
-        </div>
-      </div>
-    </section>
-
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <div>© <span id="year"></span> KOMILK • Semua hak cipta dilindungi</div>
-        <div class="footer-links">
-          <a href="#">Privacy</a>
-          <a href="#">Kontak</a>
-        </div>
-      </div>
-    </footer>
-  </main>
-
-  <!-- Cart Drawer -->
-  <aside id="cartDrawer" class="cart-drawer" aria-hidden="true" aria-label="Keranjang belanja">
-    <div class="cart-header">
-      <h4>Keranjang</h4>
-      <button id="closeCartBtn" class="btn btn-icon" aria-label="Tutup keranjang">✕</button>
     </div>
+  </section>
 
-    <div id="cartItems" class="cart-items">
-      <p class="empty-note">Keranjang kosong — pilih produk dulu.</p>
+  <section id="contact" class="container section">
+    <h2 class="section-title">Kunjungi Kami</h2>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="icon-box">📍</div>
+        <h3>Lokasi</h3>
+        <p>Jl. Talasalapang No.58<br>Makassar, Sulawesi Selatan</p>
+      </div>
+      <div class="contact-item">
+        <div class="icon-box">⏰</div>
+        <h3>Jam Buka</h3>
+        <p>Senin - Sabtu<br>17.00 - 23.00 WITA</p>
+      </div>
+      <div class="contact-item">
+        <div class="icon-box">📞</div>
+        <h3>Kontak</h3>
+        <p>WhatsApp: 0823-4377-7085<br>Instagram: @komilk.id</p>
+      </div>
     </div>
+  </section>
 
-    <div class="cart-footer">
-      <div class="cart-total">
+  <footer class="footer">
+    <div class="container">
+      &copy; 2025 KOMILK. Freshly made in Makassar.
+    </div>
+  </footer>
+
+  <div id="overlay" class="overlay"></div>
+  <div id="cartDrawer" class="drawer">
+    <div class="drawer-head">
+      <h3>Pesananmu</h3>
+      <button id="closeCartBtn">✕</button>
+    </div>
+    <div id="cartItems" class="drawer-body"></div>
+    <div class="drawer-foot">
+      <div class="total-row">
         <span>Total</span>
-        <strong id="cartTotal">Rp 0</strong>
+        <span id="cartTotal">Rp 0</span>
       </div>
-      <button id="checkoutBtn" class="btn btn-primary btn-block">Checkout via WhatsApp</button>
-      <button id="clearCartBtn" class="btn btn-ghost btn-block">Kosongkan Keranjang</button>
+      <button id="checkoutBtn" class="btn-wa">Kirim ke WhatsApp</button>
+      <button id="clearCartBtn" class="btn-text">Kosongkan</button>
     </div>
-  </aside>
-
-  <div id="overlay" class="overlay" aria-hidden="true"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>

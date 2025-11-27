@@ -1,52 +1,83 @@
 // ===== CONFIG =====
-// Ganti nomor tujuan WhatsApp (format internasional tanpa +)
-// contoh: "6281234567890"
-const WHATSAPP_NUMBER = "62812YOURNUMBER";
+// Ganti dengan nomor WhatsApp kamu (format: 628xxx)
+const WHATSAPP_NUMBER = "6281241813632"; 
 
-// Produk contoh — sesuaikan nama, harga (angka), gambar (assets/)
 const PRODUCTS = [
-  { id: "p1", name: "KOMILK Original 250ml", price: 8000, image: "assets/prod_original.png", desc: "Susu segar original, lembut dan bergizi." },
-  { id: "p2", name: "KOMILK Coklat 250ml", price: 9000, image: "assets/prod_coklat.png", desc: "Rasa coklat nikmat, favorit keluarga." },
-  { id: "p3", name: "KOMILK Strawberry 250ml", price: 9000, image: "assets/prod_strawberry.png", desc: "Rasa strawberry segar." }
+  { 
+    id: "k1", 
+    name: "KOMILK Murni", 
+    price: 15000, 
+    image: "assets/prod_murni.png", 
+    desc: "Susu murni segar, creamy, dan alami tanpa campuran." 
+  },
+  { 
+    id: "k2", 
+    name: "KOMILK Gula Aren", 
+    price: 15000, 
+    image: "assets/prod_gula_aren.png", 
+    desc: "Perpaduan susu segar dengan manis legit gula aren asli." 
+  },
+  { 
+    id: "k3", 
+    name: "KOMILK Strawberry", 
+    price: 15000, 
+    image: "assets/prod_strawberry.png", 
+    desc: "Rasa strawberry manis asam yang menyegarkan." 
+  },
+  { 
+    id: "k4", 
+    name: "KOMILK Matcha", 
+    price: 15000, 
+    image: "assets/prod_matcha.jpg", 
+    desc: "Aroma teh hijau Jepang premium yang menenangkan." 
+  },
+  { 
+    id: "k5", 
+    name: "KOMILK Jahe", 
+    price: 15000, 
+    image: "assets/prod_jahe.jpg", 
+    desc: "Hangat dan sehat dengan ekstrak jahe alami." 
+  }
 ];
 
 // ===== Utilities =====
 const qs = sel => document.querySelector(sel);
-const qsa = sel => Array.from(document.querySelectorAll(sel));
 const formatRupiah = n => {
-  const num = Number(n || 0);
-  return 'Rp ' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return 'Rp ' + Number(n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-// ===== State =====
-let cart = {}; // { productId: qty }
+// ===== State & Cart Logic =====
+let cart = {};
 const CART_KEY = "komilk_cart_v2";
+
 function loadCart(){
   try {
     const raw = localStorage.getItem(CART_KEY);
-    if(raw) cart = JSON.parse(raw) || {};
+    cart = raw ? JSON.parse(raw) : {};
   } catch(e){ cart = {}; }
 }
 function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
 
-// ===== Render products =====
+// ===== Render =====
 function renderProducts(){
   const grid = qs("#productsGrid");
   grid.innerHTML = "";
+  
   PRODUCTS.forEach(p => {
     const card = document.createElement("article");
     card.className = "product-card";
     card.innerHTML = `
-      <img class="product-thumb" src="${p.image}" alt="${escapeHtml(p.name)}" onerror="this.src='assets/placeholder.png'">
+      <div class="img-wrapper">
+        <img class="product-thumb" src="${p.image}" alt="${p.name}" loading="lazy">
+      </div>
       <div class="product-info">
-        <div class="product-title">${escapeHtml(p.name)}</div>
-        <p class="product-desc">${escapeHtml(p.desc)}</p>
-        <div class="product-row">
+        <h3 class="product-title">${p.name}</h3>
+        <p class="product-desc">${p.desc}</p>
+        <div class="product-footer">
           <div class="price">${formatRupiah(p.price)}</div>
-          <div class="card-actions">
-            <button class="btn btn-ghost" data-id="${p.id}" data-action="quick">Lihat</button>
-            <button class="btn btn-primary" data-id="${p.id}" data-action="add">Tambah</button>
-          </div>
+          <button class="btn btn-add" data-id="${p.id}" data-action="add">
+            + Pesan
+          </button>
         </div>
       </div>
     `;
@@ -54,160 +85,120 @@ function renderProducts(){
   });
 }
 
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// ===== Cart UI =====
-const cartDrawer = qs("#cartDrawer");
-const overlay = qs("#overlay");
-const cartCountEl = qs("#cartCount");
-const cartItemsEl = qs("#cartItems");
-const cartTotalEl = qs("#cartTotal");
-
+// ===== UI Updates =====
 function updateCartUI(){
-  // count
-  const totalItems = Object.values(cart).reduce((s,q)=> s+q,0);
-  cartCountEl.textContent = totalItems;
-
-  // render items
-  cartItemsEl.innerHTML = "";
+  const totalItems = Object.values(cart).reduce((s,q)=> s+q, 0);
+  qs("#cartCount").textContent = totalItems;
+  
+  // Update list di drawer
+  const container = qs("#cartItems");
+  container.innerHTML = "";
+  
   if(totalItems === 0){
-    cartItemsEl.innerHTML = `<p class="empty-note">Keranjang kosong — pilih produk dulu.</p>`;
-    cartTotalEl.textContent = formatRupiah(0);
+    container.innerHTML = `<div class="empty-state">Keranjang masih kosong.<br>Yuk pilih minuman segarmu!</div>`;
+    qs("#cartTotal").textContent = formatRupiah(0);
     return;
   }
 
+  let grandTotal = 0;
   Object.keys(cart).forEach(pid => {
     const qty = cart[pid];
     const product = PRODUCTS.find(p => p.id === pid);
     if(!product) return;
+    
+    grandTotal += (product.price * qty);
+    
     const item = document.createElement("div");
     item.className = "cart-item";
     item.innerHTML = `
-      <img src="${product.image}" alt="${escapeHtml(product.name)}" onerror="this.src='assets/placeholder.png'">
-      <div style="flex:1; min-width:0;">
-        <div style="font-weight:800">${escapeHtml(product.name)}</div>
-        <div style="font-size:13px; color:#6b7280">${formatRupiah(product.price)}</div>
+      <img src="${product.image}" alt="${product.name}">
+      <div class="cart-details">
+        <div class="cart-name">${product.name}</div>
+        <div class="cart-price">${formatRupiah(product.price)}</div>
       </div>
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-        <div class="qty-controls">
-          <button data-id="${product.id}" class="dec" aria-label="Kurangi">-</button>
-          <div style="min-width:28px; text-align:center; font-weight:800">${qty}</div>
-          <button data-id="${product.id}" class="inc" aria-label="Tambah">+</button>
-        </div>
-        <div style="font-weight:900; color:var(--primary)">${formatRupiah(product.price * qty)}</div>
+      <div class="qty-group">
+        <button class="qty-btn dec" data-id="${pid}">-</button>
+        <span>${qty}</span>
+        <button class="qty-btn inc" data-id="${pid}">+</button>
       </div>
     `;
-    cartItemsEl.appendChild(item);
+    container.appendChild(item);
   });
-
-  const totalPrice = Object.keys(cart).reduce((s,pid)=> {
-    const pr = PRODUCTS.find(x => x.id === pid);
-    return s + (pr ? pr.price * cart[pid] : 0);
-  }, 0);
-
-  cartTotalEl.textContent = formatRupiah(totalPrice);
+  
+  qs("#cartTotal").textContent = formatRupiah(grandTotal);
 }
 
-// ===== Cart operations =====
-function addToCart(productId, qty=1){
-  if(!cart[productId]) cart[productId] = 0;
-  cart[productId] += qty;
-  if(cart[productId] <= 0) delete cart[productId];
+// ===== Actions =====
+function addToCart(pid, qty){
+  if(!cart[pid]) cart[pid] = 0;
+  cart[pid] += qty;
+  if(cart[pid] <= 0) delete cart[pid];
   saveCart();
   updateCartUI();
-}
-
-function clearCart(confirmAsk = true){
-  if(confirmAsk){
-    if(!confirm("Kosongkan keranjang?")) return;
+  
+  // Efek visual kecil saat tambah
+  if(qty > 0) {
+    const btn = qs("#openCartBtn");
+    btn.classList.add("bump");
+    setTimeout(()=> btn.classList.remove("bump"), 200);
   }
-  cart = {};
-  saveCart();
-  updateCartUI();
 }
 
-// ===== Drawer open/close =====
-function openCart(){
-  cartDrawer.classList.add("open");
-  overlay.classList.add("open");
-  overlay.setAttribute("aria-hidden","false");
-  cartDrawer.setAttribute("aria-hidden","false");
-}
-function closeCart(){
-  cartDrawer.classList.remove("open");
-  overlay.classList.remove("open");
-  overlay.setAttribute("aria-hidden","true");
-  cartDrawer.setAttribute("aria-hidden","true");
-}
-
-// ===== Checkout (WhatsApp) =====
-function checkoutToWhatsApp(){
+function checkoutWA(){
   const items = Object.keys(cart);
-  if(items.length === 0){
-    alert("Keranjang kosong. Tambahkan produk terlebih dahulu.");
-    return;
-  }
-  // build message
-  let lines = [];
-  lines.push("Halo KOMILK, saya ingin memesan:");
+  if(items.length === 0) return alert("Keranjang kosong!");
+  
+  let text = `Halo KOMILK, saya mau pesan:\n\n`;
+  let total = 0;
+  
   items.forEach(pid => {
     const p = PRODUCTS.find(x => x.id === pid);
-    if(!p) return;
-    lines.push(`- ${p.name} x ${cart[pid]}`);
+    const qty = cart[pid];
+    const subtotal = p.price * qty;
+    total += subtotal;
+    text += `- ${p.name} (${qty}x) : ${formatRupiah(subtotal)}\n`;
   });
-  const total = Object.keys(cart).reduce((s,pid)=>{
-    const p = PRODUCTS.find(x => x.id === pid);
-    return s + (p ? p.price * cart[pid] : 0);
-  }, 0);
-  lines.push(`Total: ${formatRupiah(total)}`);
-  lines.push("");
-  lines.push("Alamat pengiriman: ");
-  lines.push("Nomor telepon: ");
-
-  const text = encodeURIComponent(lines.join("\n"));
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-  window.open(url, "_blank");
+  
+  text += `\n*Total: ${formatRupiah(total)}*`;
+  text += `\n\nNama Penerima: \nAlamat: `;
+  
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`, "_blank");
 }
 
-// ===== Events =====
+// ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
-  renderProducts();
   loadCart();
+  renderProducts();
   updateCartUI();
-  qs("#year").textContent = new Date().getFullYear();
-
-  // product buttons (delegation)
+  
+  // Event Delegation
   qs("#productsGrid").addEventListener("click", e => {
-    const btn = e.target.closest("button");
+    const btn = e.target.closest("button[data-action='add']");
+    if(btn) addToCart(btn.dataset.id, 1);
+  });
+
+  qs("#cartItems").addEventListener("click", e => {
+    const btn = e.target.closest(".qty-btn");
     if(!btn) return;
     const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    if(action === "add") addToCart(id, 1);
-    if(action === "quick"){
-      const p = PRODUCTS.find(x => x.id === id);
-      if(p) alert(`${p.name}\n\n${p.desc}\n\nHarga: ${formatRupiah(p.price)}`);
-    }
+    if(btn.classList.contains("inc")) addToCart(id, 1);
+    if(btn.classList.contains("dec")) addToCart(id, -1);
   });
 
-  // open/close cart
-  qs("#openCartBtn").addEventListener("click", openCart);
-  qs("#closeCartBtn").addEventListener("click", closeCart);
-  overlay.addEventListener("click", closeCart);
-
-  // cart inc/dec (delegation)
-  cartItemsEl.addEventListener("click", e => {
-    const inc = e.target.closest(".inc");
-    const dec = e.target.closest(".dec");
-    if(inc){
-      const id = inc.dataset.id;
-      addToCart(id, 1);
-    } else if(dec){
-      const id = dec.dataset.id;
-      addToCart(id, -1);
-    }
+  qs("#openCartBtn").addEventListener("click", () => {
+    qs("#cartDrawer").classList.add("active");
+    qs("#overlay").classList.add("active");
   });
-
-  // checkout & clear
-  qs("#checkoutBtn").addEventListener("click", checkoutToWhatsApp);
-  qs("#clearCartBtn").addEventListener("click", () => clearCart(true));
+  
+  const close = () => {
+    qs("#cartDrawer").classList.remove("active");
+    qs("#overlay").classList.remove("active");
+  };
+  
+  qs("#closeCartBtn").addEventListener("click", close);
+  qs("#overlay").addEventListener("click", close);
+  qs("#checkoutBtn").addEventListener("click", checkoutWA);
+  qs("#clearCartBtn").addEventListener("click", () => {
+    if(confirm("Hapus semua item?")) { cart={}; saveCart(); updateCartUI(); }
+  });
 });
